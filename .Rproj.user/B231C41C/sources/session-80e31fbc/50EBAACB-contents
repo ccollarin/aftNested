@@ -1,0 +1,69 @@
+rm(list = ls())
+library(devtools)
+load_all()
+# load_all("./aftNested")
+
+wrap_rweibull <- function(n, lambda, gamma, dist = FALSE){
+  # generate from a weibull using the parametrization in the draft
+  sc <- lambda^(-1/gamma); sh <- gamma
+  if(dist) return(pweibull(n, scale = sc, shape = sh))
+  rweibull(n, scale = sc, shape = sh)
+}
+
+n <- 2000
+p <- 5
+qcens <- .97
+
+aa <- c(4,-2,1,0,0)
+X <- matrix(rbeta(n*(p), 0.5,2), ncol = p)
+x1 <- 2*rbeta(n, 0.5,2)
+pp <- rbinom(n,1,0.5)
+# times <- X[,1:p]%*%aa + sin(5*x1) + pp*wrap_rweibull(n, 1,1) + (1-pp)*wrap_rweibull(n, 6,1)
+times <- X[,1:p]%*%aa + sin(5*x1) + wrap_rweibull(n, 1,1)
+
+par(mfrow = c(2,2))
+plot(density(times-(X[,1:p]%*%aa + sin(x1))))
+plot(times~X[,1])
+plot(times~X[,p])
+plot(times~x1)
+
+dat <- data.frame(times = times,
+                  x1 = x1,
+                  x2 = X)
+
+# add censoring ####
+C <- quantile(dat$times, qcens)
+dat$c <- as.numeric(dat$times<C)
+dat$times[dat$c==0] <- C
+hist(dat$times, breaks = 50)
+hist(exp(dat$times), breaks = 50)
+
+sample_val <- sample.int(n, n/4)
+validation <- dat[sample_val,]
+dat <- dat[-sample_val,]
+
+fit2 <- aft_nl(times ~ s(x1, k=40) + x2.1 + x2.2 + x2.3+x2.4+x2.5,outer.args = list(k=10),
+               data = dat, val = validation, #unif=FALSE,
+               censored = "c", trace = TRUE, ps = TRUE)
+
+f2 <- get.si(fit2$smooth, fit2$coefficients)
+
+f2$alpha[1:p+1]
+aa
+lintrue <- -as.matrix(dat[,3:7])%*%aa
+smtrue <- -sin(5*dat$x1)+mean(sin(5*dat$x1))
+par(mfrow = c(2,2))
+plot(aa, pch=20, cex = 1.5, main = "linear coef")
+points(-f2$alpha[1:p+1], col="red", cex = 1.5, pch = 20)
+plot(as.matrix(fit2$smooth$xt$si$X[, 2:(p+1)])%*%f2$alpha[1:p+1]~lintrue,
+     main = "linear part")
+plot(smtrue~dat$x1, ylim= c(-1,1.5),main = "smooth part")
+points(fit2$smooth$xt$si$X[,-(1:(p+1))]%*%(f2$alpha[-(1:(p+1))])~dat$x1, col="red")
+
+W <- drop(dat$times +lintrue + smtrue) ##observed noise
+
+xx <- seq(0, max(W), length.out = 1000)
+plot(wrap_rweibull(xx, 1, 1, TRUE)~xx)
+points(rank(W)/length(W)~ W, col="grey") # ecdf
+points(1-exp(f2$s$s)~f2$xba, col="red") # estimated survival
+

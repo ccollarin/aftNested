@@ -1,0 +1,26 @@
+.prep.df <- function(formula, data, m = NULL, k = NULL){
+  if(is.null(m)) m <- c(4,2)
+  if(is.null(k)) k <- 10
+
+  tmp <- gam(formula, data = data, fit = FALSE)
+  rm.intercept <- attr(tmp$pterms, "intercept")>0
+
+  if(rm.intercept){X <- tmp$X[, - attr(tmp$pterms, "intercept")]
+  }else{X <- tmp$X}
+
+  mod <- as.matrix(cbind(tmp$y,X))
+  dat <- data.frame(log.times = tmp$y)
+  dat$single <- mod
+  S <- lapply(tmp$smooth,
+              function(sm) {
+                ss <- diag(rep(0, length.out = ncol(mod)))
+                fplp <- tmp$smooth[[1]]$first.para:tmp$smooth[[1]]$last.para -
+                  attr(tmp$pterms, "intercept")
+                ss[fplp+1, fplp+1] <- tmp$smooth[[1]]$S[[1]]
+                return(ss)
+              })
+
+  return(list(X = dat,
+              S = S,
+              formula = ~s_ncon(single, m=m, k=k, trans = trans_linear(S = S))))
+}

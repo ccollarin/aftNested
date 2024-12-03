@@ -1,0 +1,17 @@
+{
+    "dialog-state": {
+        "query": "print",
+        "path": "/R",
+        "regex": false,
+        "caseSensitive": false,
+        "wholeWord": true,
+        "filePatterns": [],
+        "useGitGrep": false,
+        "excludeGitIgnore": true,
+        "excludeFilePatterns": [],
+        "resultsCount": 11,
+        "errorCount": 0,
+        "replaceErrors": "",
+        "projectRelative": true
+    }
+}

@@ -1,0 +1,32 @@
+{
+    "args": [
+        "-std=gnu++17",
+        "-I/usr/share/R/include",
+        "-DNDEBUG",
+        "-I/home/claudia/R/x86_64-pc-linux-gnu-library/4.4/Rcpp/include",
+        "-fpic",
+        "-fno-omit-frame-pointer",
+        "-ffile-prefix-map=/build/r-base-4sITk6/r-base-4.4.2=.",
+        "-fstack-protector-strong",
+        "-fstack-clash-protection",
+        "-fcf-protection",
+        "-fdebug-prefix-map=/build/r-base-4sITk6/r-base-4.4.2=/usr/src/r-base-4.4.2-1.2404.0",
+        "-D_FORTIFY_SOURCE=3",
+        "-I/home/claudia/R/x86_64-pc-linux-gnu-library/4.4/Rcpp/include",
+        "-I/home/claudia/R/x86_64-pc-linux-gnu-library/4.4/RcppArmadillo/include",
+        "-DEIGEN_DONT_VECTORIZE",
+        "-I/usr/include/c++/13",
+        "-I/usr/include/x86_64-linux-gnu/c++/13",
+        "-I/usr/include/c++/13/backward",
+        "-I/usr/lib/gcc/x86_64-linux-gnu/13/include",
+        "-I/usr/local/include",
+        "-I/usr/include/x86_64-linux-gnu",
+        "-I/usr/include"
+    ],
+    "pch": "RcppArmadillo",
+    "is_cpp": true,
+    "hash": "1731061814",
+    "compiler": "3953919279263754508",
+    "rversion": "4.4.2",
+    "dbversion": 4
+}

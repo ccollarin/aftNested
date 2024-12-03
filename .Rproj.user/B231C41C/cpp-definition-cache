@@ -1,0 +1,52 @@
+[
+    {
+        "file": "/home/claudia/Dropbox/dottorato pd/Accelerated_failure_time/code/aftNested/src/I_ckde.cpp",
+        "file_last_write": 1731676045.0,
+        "definitions": [
+            {
+                "usr": "c:@F@gauss_kce#$@N@Rcpp@S@Vector>#VI14#@N@Rcpp@ST>1#T@PreserveStorage#$@N@arma@S@Mat>#d#I#S0_#S1_#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "gauss_kce(NumericVector, arma::mat, int, NumericVector, arma::mat, double)",
+                "file": "/home/claudia/Dropbox/dottorato pd/Accelerated_failure_time/code/aftNested/src/I_ckde.cpp",
+                "line": 9,
+                "column": 6,
+                "hidden": false
+            },
+            {
+                "usr": "c:@F@triweight_kce#$@N@Rcpp@S@Vector>#VI14#@N@Rcpp@ST>1#T@PreserveStorage#$@N@arma@S@Mat>#d#I#S0_#S1_#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "triweight_kce(NumericVector, arma::mat, int, NumericVector, arma::mat, double)",
+                "file": "/home/claudia/Dropbox/dottorato pd/Accelerated_failure_time/code/aftNested/src/I_ckde.cpp",
+                "line": 115,
+                "column": 6,
+                "hidden": false
+            }
+        ],
+        "hidden": false
+    },
+    {
+        "file": "/home/claudia/Dropbox/dottorato pd/Accelerated_failure_time/code/aftNested/src/order_cpp.cpp",
+        "file_last_write": 1731576673.0,
+        "definitions": [
+            {
+                "usr": "c:@F@order_#$@N@Rcpp@S@Vector>#VI14#@N@Rcpp@ST>1#T@PreserveStorage#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "order_(NumericVector)",
+                "file": "/home/claudia/Dropbox/dottorato pd/Accelerated_failure_time/code/aftNested/src/order_cpp.cpp",
+                "line": 6,
+                "column": 6,
+                "hidden": false
+            }
+        ],
+        "hidden": false
+    },
+    {
+        "file": "/home/claudia/Dropbox/dottorato pd/Accelerated_failure_time/code/aftNested/src/order_cpp.h",
+        "file_last_write": 1731513321.0,
+        "definitions": [],
+        "hidden": false
+    }
+]

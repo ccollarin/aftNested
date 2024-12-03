@@ -1,0 +1,50 @@
+.prep.df <- function(formula, data, val = NULL,censored, m = NULL, k = NULL, pspline = FALSE){
+  if(is.null(m)) m <- c(4,2)
+  if(is.null(k)) k <- 10
+
+  tmp <- gam(formula, data = data)
+  interc<- attr(tmp$pterms, "intercept")
+
+  if(interc >0 ){X <- predict(tmp, type = "lpmatrix")[, - interc]
+  }else{X <- predict(tmp, type = "lpmatrix")}
+
+  mod <- as.matrix(cbind(tmp$y,X))
+  dat <- data.frame(log.times = tmp$y,
+                    data[censored])
+
+  dat$single <- mod
+  if(pspline){
+    fplp <- lapply(tmp$smooth, function(sm) sm$first.para:sm$last.para -
+                     interc+1)
+    S <- lapply(tmp$smooth,
+                function(sm) {
+                  ss <- diag(rep(0, length.out = ncol(mod)))
+                  fplp <- sm$first.para:sm$last.para -
+                    interc
+                  ss[fplp+1, fplp+1] <- sm$S[[1]]
+                  return(ss)
+                })
+    lambda <- lapply(1:length(S),
+                     function(ii) {
+                       jj <- fplp[[ii]]
+                       initial.sp(mod[,jj], list(S[[ii]][jj,jj]), 1)
+                     })
+    form <- ~s_ncon(single, m=m, k=k, trans = trans_linear(S = S, fplp = fplp, l0 = lambda))
+  } else{
+    form <- ~s_ncon(single, m=m, k=k, trans = trans_linear())
+    S <- NULL
+  }
+
+  df.val <- data.frame(log.times = val[,attr(tmp$pterms, "response")],
+                    val[censored])
+  Xval <- predict(tmp, type = "lpmatrix",newdata = val)
+
+  if(interc >0 ){
+    df.val$single <- as.matrix(cbind(df.val$log.times, Xval[, - interc]))
+  }else{df.val$single <- as.matrix(cbind(df.val$log.times, Xval))}
+
+  return(list(X = dat,
+              val = df.val,
+              S = S,
+              formula = form))
+}

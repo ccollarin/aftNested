@@ -1,0 +1,38 @@
+########
+# Diagonalise a penalty
+########
+# INPUT
+# X is the model matrix
+# S is the penalty matrix on the coefficients
+# r is rank of penalty matrix S
+#
+# OUTPUT
+# Reparametrised versions of B and S, and reparametrisation matrix B
+#
+.diagPen <- function(X, S, r, fl)
+{
+  if(!is.list(S)) S <- list(S)
+  if(!is.list(r)) r <- list(r)
+  Bo <- diag(rep(1, length.out = ncol(X)))
+  So <- diag(rep(0, length.out = ncol(X)))
+  for(ii in 1:length(S)){
+    d <- length(fl[[ii]])
+    jj <- fl[[ii]]
+
+    # Bo[jj,jj] <- .getBmatrix(P = S[[ii]][jj,jj], r = r[[ii]])
+    Bo[jj,jj] <- diag(1, d,d)
+
+    # Reparametrise so that penalty is diagonal
+    X[,jj] <- X[,jj] %*% Bo[jj,jj]
+    So[jj,jj] <- S[[ii]][jj,jj]
+    # So[jj,jj] <- diag(as.numeric(1:d <= r[[ii]]), d, d)
+  }
+
+  out <- list("X" = X,
+              "S" = So,
+              "B" = Bo,
+              "rank" = r)
+
+  return( out )
+
+}

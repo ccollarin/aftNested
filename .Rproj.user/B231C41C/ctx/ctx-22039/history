@@ -1,0 +1,512 @@
+X <- matrix(runif(n*p), ncol = p)
+params <- rnorm(p)
+theta <- c(lambda1 = 0.1, gamma1 = 3, lambda2=0.1, gamma2=1.6, p=0.8)
+S0 <- function(t, p, lambda1 = 0.1, gamma1 = 3, lambda2=0.1, gamma2=1.6){
+p*exp(-lambda1*t^gamma1) + (1-p)*exp(-lambda2 * t^gamma2)
+}
+wrap_rweibull <- function(n, lambda, gamma){
+# generate from a weibull using the parametrization in the draft
+sc <- lambda^(-1/gamma); sh <- gamma
+rweibull(n, scale = sc, shape = sh)
+}
+pp <- rbinom(n, size = 1, prob = theta["p"])
+rw1 <- apply(X, 1,
+FUN = function(xx) wrap_rweibull(1, theta["lambda1"]*exp(- xx%*%params * theta["gamma1"]),
+theta["gamma1"]))
+rw2 <- apply(X, 1,
+FUN = function(xx) wrap_rweibull(1, theta["lambda2"]*exp(- xx%*%params * theta["gamma2"]),
+theta["gamma2"]))
+times <- rw1*pp + (1-pp)*rw2
+par(mfrow = c(2,1))
+hist(times, breaks = 50)
+rm(list = ls())
+set.seed(123)
+## simulate data ####
+n <- 1000
+p <- 2
+X <- matrix(runif(n*p), ncol = p)
+params <- rnorm(p)
+theta <- c(lambda1 = 0.1, gamma1 = 3, lambda2=0.1, gamma2=1.6, p=0.8)
+S0 <- function(t, p, lambda1 = 0.1, gamma1 = 3, lambda2=0.1, gamma2=1.6){
+p*exp(-lambda1*t^gamma1) + (1-p)*exp(-lambda2 * t^gamma2)
+}
+wrap_rweibull <- function(n, lambda, gamma){
+# generate from a weibull using the parametrization in the draft
+sc <- lambda^(-1/gamma); sh <- gamma
+rweibull(n, scale = sc, shape = sh)
+}
+pp <- rbinom(n, size = 1, prob = theta["p"])
+rw1 <- apply(X, 1,
+FUN = function(xx) wrap_rweibull(1, theta["lambda1"]*exp(- xx%*%params * theta["gamma1"]),
+theta["gamma1"]))
+rw2 <- apply(X, 1,
+FUN = function(xx) wrap_rweibull(1, theta["lambda2"]*exp(- xx%*%params * theta["gamma2"]),
+theta["gamma2"]))
+times <- rw1*pp + (1-pp)*rw2
+par(mfrow = c(2,1))
+hist(times, breaks = 50)
+dat <- data.frame(times = times)
+dat$st <- cbind(log(times), X)
+# add censoring ####
+C <- quantile(times, 0.9)
+dat$c <- as.numeric(dat$times<C)
+dat$st[dat$c==0,1] <- log(C)
+dat$times[dat$c==0] <- C
+hist(dat$times, breaks = 50)
+rm(list = ls())
+set.seed(123)
+## simulate data ####
+n <- 1000
+p <- 2
+X <- matrix(runif(n*p), ncol = p)
+params <- rnorm(p)
+theta <- c(lambda1 = 0.1, gamma1 = 3, lambda2=0.1, gamma2=1.6, p=0.8)
+S0 <- function(t, p, lambda1 = 0.1, gamma1 = 3, lambda2=0.1, gamma2=1.6){
+p*exp(-lambda1*t^gamma1) + (1-p)*exp(-lambda2 * t^gamma2)
+}
+wrap_rweibull <- function(n, lambda, gamma){
+# generate from a weibull using the parametrization in the draft
+sc <- lambda^(-1/gamma); sh <- gamma
+rweibull(n, scale = sc, shape = sh)
+}
+pp <- rbinom(n, size = 1, prob = theta["p"])
+rw1 <- apply(X, 1,
+FUN = function(xx) wrap_rweibull(1, theta["lambda1"]*exp(- xx%*%params * theta["gamma1"]),
+theta["gamma1"]))
+rw2 <- apply(X, 1,
+FUN = function(xx) wrap_rweibull(1, theta["lambda2"]*exp(- xx%*%params * theta["gamma2"]),
+theta["gamma2"]))
+times <- rw1*pp + (1-pp)*rw2
+par(mfrow = c(1,2))
+hist(times, breaks = 50)
+dat <- data.frame(times = times)
+dat$st <- cbind(log(times), X)
+# add censoring ####
+C <- quantile(times, 0.9)
+dat$c <- as.numeric(dat$times<C)
+dat$st[dat$c==0,1] <- log(C)
+dat$times[dat$c==0] <- C
+hist(dat$times, breaks = 50)
+rm(list = ls())
+set.seed(123)
+## simulate data ####
+n <- 1000
+p <- 2
+X <- matrix(runif(n*p), ncol = p)
+params <- rnorm(p)
+theta <- c(lambda1 = 0.1, gamma1 = 3, lambda2=0.1, gamma2=1.6, p=0.8)
+S0 <- function(t, p, lambda1 = 0.1, gamma1 = 3, lambda2=0.1, gamma2=1.6){
+p*exp(-lambda1*t^gamma1) + (1-p)*exp(-lambda2 * t^gamma2)
+}
+wrap_rweibull <- function(n, lambda, gamma){
+# generate from a weibull using the parametrization in the draft
+sc <- lambda^(-1/gamma); sh <- gamma
+rweibull(n, scale = sc, shape = sh)
+}
+pp <- rbinom(n, size = 1, prob = theta["p"])
+rw1 <- apply(X, 1,
+FUN = function(xx) wrap_rweibull(1, theta["lambda1"]*exp(- xx%*%params * theta["gamma1"]),
+theta["gamma1"]))
+rw2 <- apply(X, 1,
+FUN = function(xx) wrap_rweibull(1, theta["lambda2"]*exp(- xx%*%params * theta["gamma2"]),
+theta["gamma2"]))
+times <- rw1*pp + (1-pp)*rw2
+par(mfrow = c(1,2))
+hist(times, breaks = 50)
+dat <- data.frame(times = times)
+dat$st <- cbind(log(times), X)
+# add censoring ####
+C <- quantile(times, 0.9)
+dat$c <- as.numeric(dat$times<C)
+dat$st[dat$c==0,1] <- log(C)
+dat$times[dat$c==0] <- C
+hist(dat$times, breaks = 50)
+## generate basis ####
+library(devtools)
+load_all()
+build()
+document()
+document()
+document()
+build()
+document()
+## generate basis ####
+library(devtools)
+load_all()
+sm_si <- gamFactory:::smooth.construct.si.smooth.spec(object = s_nest(st, m=c(4,2), k = 10,
+trans = trans_linear()),
+data = dat, knots = list())
+sm_misi <- aftNested:::smooth.construct.misi.smooth.spec(object = s_ncon(st, m=c(4,2), k = 10,
+trans = trans_linear()),
+data = dat, knots = list())
+load_all()
+sm_misi <- aftNested:::smooth.construct.misi.smooth.spec(object = s_ncon(st, m=c(4,2), k = 10,
+trans = trans_linear()),
+data = dat, knots = list())
+load_all()
+sm_misi <- aftNested:::smooth.construct.misi.smooth.spec(object = s_ncon(st, m=c(4,2), k = 10,
+trans = trans_linear()),
+data = dat, knots = list())
+traceback()
+document()
+document()
+load_all()
+sm_misi <- aftNested:::smooth.construct.misi.smooth.spec(object = s_ncon(st, m=c(4,2), k = 10,
+trans = trans_linear()),
+data = dat, knots = list())
+traceback()
+document()
+sm_misi <- aftNested:::smooth.construct.misi.smooth.spec(object = s_ncon(st, m=c(4,2), k = 10,
+trans = trans_linear()),
+data = dat, knots = list())
+traceback()
+document()
+load_all()
+sm_misi <- aftNested:::smooth.construct.misi.smooth.spec(object = s_ncon(st, m=c(4,2), k = 10,
+trans = trans_linear()),
+data = dat, knots = list())
+document()
+load_all()
+sm_misi <- aftNested:::smooth.construct.misi.smooth.spec(object = s_ncon(st, m=c(4,2), k = 10,
+trans = trans_linear()),
+data = dat, knots = list())
+z <- dat[[sm_misi$term]] %*% sm_misi$xt$si$alpha
+X <- sm_misi$xt$basis$evalX(z, deriv = 1)
+ss <- X$X0%*%betat
+beta
+bet
+z <- dat[[sm_misi$term]] %*% sm_misi$xt$si$alpha
+X <- sm_misi$xt$basis$evalX(z, deriv = 1)
+ss <- X$X0%*%betat
+beta <- rnorm(ncol(X[[1]]))
+betat <- c(beta[1], exp(beta[-1]))
+z <- dat[[sm_misi$term]] %*% sm_misi$xt$si$alpha
+X <- sm_misi$xt$basis$evalX(z, deriv = 1)
+ss <- X$X0%*%betat
+ss1 <- X$X1%*% betat
+plot(ss~z)
+plot(ss1~z);abline(h=0, col="grey")
+xx <- seq(-10,10, length.out = 1000)
+matplot(sm_misi$xt$basis$evalX(xx, deriv = 1)$X0, x = xx, type = 'l')
+htx <- function(eff){
+# hazard function (for now without dependence on X)
+exp(eff$f)*eff$store$f1*exp(-eff$store$Xi[,1])*eff$param[1]
+} # end htx
+Stx <- function(eff){
+# survival function (for now without dependence on X)
+exp(-exp(eff$f))
+} # end Stx
+# define the smooth function
+alph <- sm_misi$xt$si$alpha
+bet <- rnorm(ncol(sm_misi$X)-(p+1))
+f1 <- eff_misi(dat$st, basis = sm_misi$xt$basis)
+f1 <- f1$eval(c(alph, bet), deriv = 2)
+library(ggplot2)
+gridExtra::grid.arrange(
+ggplot(data.frame(x = f1$ax,
+log_htx = log(htx(f1))), aes(x = x, y=log_htx))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = f1$ax,
+stx = Stx(f1)), aes(x = x, y=stx))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = f1$ax,
+f = f1$f), aes(x = x, y=f))+
+geom_line()+geom_point(), ncol=2)
+## define likelihood
+llk <- llk_afc(f1, sm = sm_misi, delta = dat$c, lambda = 1, vpen = 1e4)
+llk(c(alph, bet))
+## optimization
+fit <- aft_nl(~s_ncon(st, m=c(4,2), k = 10, trans = trans_linear()), data = dat,
+censored = dat$c, trace = TRUE)
+document()
+load_all()
+## optimization
+fit <- aft_nl(~s_ncon(st, m=c(4,2), k = 10, trans = trans_linear()), data = dat,
+censored = dat$c, trace = TRUE)
+llk(c(alph, bet))
+source("~/Dropbox/dottorato pd/Accelerated_failure_time/code/simulations.R", echo=TRUE)
+source("~/Dropbox/dottorato pd/Accelerated_failure_time/code/simulations.R", echo=TRUE)
+X
+beta <- rnorm(ncol(X))
+betat <- c(beta[1], exp(beta[-1]))
+z <- dat[[sm_misi$term]] %*% sm_misi$xt$si$alpha
+X <- sm_misi$xt$basis$evalX(z, deriv = 1)
+ss <- X$X0%*%betat
+ss1 <- X$X1%*% betat
+beta
+beta <- rnorm(ncol(sm_misi$X)-length(sm_misi$xt$si$alpha))
+betat <- c(beta[1], exp(beta[-1]))
+z <- dat[[sm_misi$term]] %*% sm_misi$xt$si$alpha
+X <- sm_misi$xt$basis$evalX(z, deriv = 1)
+ss <- X$X0%*%betat
+ss1 <- X$X1%*% betat
+plot(ss~z)
+plot(ss1~z);abline(h=0, col="grey")
+xx <- seq(-10,10, length.out = 1000)
+matplot(sm_misi$xt$basis$evalX(xx, deriv = 1)$X0, x = xx, type = 'l')
+sm_misi <- aftNested::smooth.construct.misi.smooth.spec(object = s_ncon(st, m=c(4,2), k = 10,
+trans = trans_linear()),
+data = dat, knots = list())
+beta <- rnorm(ncol(sm_misi$X)-length(sm_misi$xt$si$alpha))
+betat <- c(beta[1], exp(beta[-1]))
+z <- dat[[sm_misi$term]] %*% sm_misi$xt$si$alpha
+X <- sm_misi$xt$basis$evalX(z, deriv = 1)
+ss <- X$X0%*%betat
+ss1 <- X$X1%*% betat
+plot(ss~z)
+plot(ss1~z);abline(h=0, col="grey")
+xx <- seq(-10,10, length.out = 1000)
+matplot(sm_misi$xt$basis$evalX(xx, deriv = 1)$X0, x = xx, type = 'l')
+# define the smooth function
+alph <- sm_misi$xt$si$alpha
+bet <- rnorm(ncol(sm_misi$X)-(p+1))
+f1 <- eff_misi(dat$st, basis = sm_misi$xt$basis)
+f1 <- f1$eval(c(alph, bet), deriv = 2)
+## define likelihood
+llk <- llk_afc(f1, sm = sm_misi, delta = dat$c, lambda = 1, vpen = 1e4)
+llk(c(alph, bet))
+n <- 1000
+p <- 2
+X <- matrix(runif(n*p), ncol = p)
+params <- rnorm(p)
+theta <- c(lambda1 = 0.1, gamma1 = 3, lambda2=0.1, gamma2=1.6, p=0.8)
+S0 <- function(t, p, lambda1 = 0.1, gamma1 = 3, lambda2=0.1, gamma2=1.6){
+p*exp(-lambda1*t^gamma1) + (1-p)*exp(-lambda2 * t^gamma2)
+}
+wrap_rweibull <- function(n, lambda, gamma){
+# generate from a weibull using the parametrization in the draft
+sc <- lambda^(-1/gamma); sh <- gamma
+rweibull(n, scale = sc, shape = sh)
+}
+pp <- rbinom(n, size = 1, prob = theta["p"])
+rw1 <- apply(X, 1,
+FUN = function(xx) wrap_rweibull(1, theta["lambda1"]*exp(- xx%*%params * theta["gamma1"]),
+theta["gamma1"]))
+rw2 <- apply(X, 1,
+FUN = function(xx) wrap_rweibull(1, theta["lambda2"]*exp(- xx%*%params * theta["gamma2"]),
+theta["gamma2"]))
+times <- rw1*pp + (1-pp)*rw2
+par(mfrow = c(1,2))
+hist(times, breaks = 50)
+dat <- data.frame(times = times)
+dat$st <- cbind(log(times), X)
+# add censoring ####
+C <- quantile(times, 0.9)
+dat$c <- as.numeric(dat$times<C)
+dat$st[dat$c==0,1] <- log(C)
+dat$times[dat$c==0] <- C
+hist(dat$times, breaks = 50)
+## generate basis ####
+library(devtools)
+load_all()
+sm_misi <- aftNested::smooth.construct.misi.smooth.spec(object = s_ncon(st, m=c(4,2), k = 10,
+trans = trans_linear()),
+data = dat, knots = list())
+beta <- rnorm(ncol(sm_misi$X)-length(sm_misi$xt$si$alpha))
+betat <- c(beta[1], exp(beta[-1]))
+z <- dat[[sm_misi$term]] %*% sm_misi$xt$si$alpha
+X <- sm_misi$xt$basis$evalX(z, deriv = 1)
+ss <- X$X0%*%betat
+ss1 <- X$X1%*% betat
+plot(ss~z)
+plot(ss1~z);abline(h=0, col="grey")
+xx <- seq(-10,10, length.out = 1000)
+matplot(sm_misi$xt$basis$evalX(xx, deriv = 1)$X0, x = xx, type = 'l')
+# define the smooth function
+alph <- sm_misi$xt$si$alpha
+bet <- rnorm(ncol(sm_misi$X)-(p+1))
+f1 <- eff_misi(dat$st, basis = sm_misi$xt$basis)
+f1 <- f1$eval(c(alph, bet), deriv = 2)
+## define likelihood
+llk <- llk_afc(f1, sm = sm_misi, delta = dat$c, lambda = 1, vpen = 1e4)
+llk(c(alph, bet))
+## optimization
+fit <- aft_nl(~s_ncon(st, m=c(4,2), k = 10, trans = trans_linear()), data = dat,
+censored = dat$c, trace = TRUE)
+n <- 1000
+p <- 2
+X <- matrix(runif(n*p), ncol = p)
+params <- rnorm(p)
+theta <- c(lambda1 = 0.1, gamma1 = 3, lambda2=0.1, gamma2=1.6, p=0.8)
+S0 <- function(t, p, lambda1 = 0.1, gamma1 = 3, lambda2=0.1, gamma2=1.6){
+p*exp(-lambda1*t^gamma1) + (1-p)*exp(-lambda2 * t^gamma2)
+}
+wrap_rweibull <- function(n, lambda, gamma){
+# generate from a weibull using the parametrization in the draft
+sc <- lambda^(-1/gamma); sh <- gamma
+rweibull(n, scale = sc, shape = sh)
+}
+pp <- rbinom(n, size = 1, prob = theta["p"])
+rw1 <- apply(X, 1,
+FUN = function(xx) wrap_rweibull(1, theta["lambda1"]*exp(- xx%*%params * theta["gamma1"]),
+theta["gamma1"]))
+rw2 <- apply(X, 1,
+FUN = function(xx) wrap_rweibull(1, theta["lambda2"]*exp(- xx%*%params * theta["gamma2"]),
+theta["gamma2"]))
+times <- rw1*pp + (1-pp)*rw2
+par(mfrow = c(1,2))
+hist(times, breaks = 50)
+dat <- data.frame(times = times)
+dat$st <- cbind(log(times), X)
+# add censoring ####
+C <- quantile(times, 0.9)
+dat$c <- as.numeric(dat$times<C)
+dat$st[dat$c==0,1] <- log(C)
+dat$times[dat$c==0] <- C
+hist(dat$times, breaks = 50)
+## generate basis ####
+library(devtools)
+load_all()
+sm_misi <- aftNested::smooth.construct.misi.smooth.spec(object = s_ncon(st, m=c(4,2), k = 10,
+trans = trans_linear()),
+data = dat, knots = list())
+beta <- rnorm(ncol(sm_misi$X)-length(sm_misi$xt$si$alpha))
+betat <- c(beta[1], exp(beta[-1]))
+z <- dat[[sm_misi$term]] %*% sm_misi$xt$si$alpha
+X <- sm_misi$xt$basis$evalX(z, deriv = 1)
+ss <- X$X0%*%betat
+ss1 <- X$X1%*% betat
+plot(ss~z)
+plot(ss1~z);abline(h=0, col="grey")
+xx <- seq(-10,10, length.out = 1000)
+matplot(sm_misi$xt$basis$evalX(xx, deriv = 1)$X0, x = xx, type = 'l')
+# define the smooth function
+alph <- sm_misi$xt$si$alpha
+bet <- rnorm(ncol(sm_misi$X)-(p+1))
+f1 <- eff_misi(dat$st, basis = sm_misi$xt$basis)
+f1 <- f1$eval(c(alph, bet), deriv = 2)
+## define likelihood
+llk <- llk_afc(f1, sm = sm_misi, delta = dat$c, lambda = 1, vpen = 1e4)
+llk(c(alph, bet))
+## optimization
+fit <- aft_nl(~s_ncon(st, m=c(4,2), k = 10, trans = trans_linear()), data = dat,
+censored = dat$c, trace = TRUE)
+fit$iterations
+fit$coef
+alph <- fit$estimate[1:3]
+alph/alph[1]
+alph <- fit$coefficients[1:3]
+alph/alph[1]
+f1 <- f1$eval(fit$estimate, deriv = 2)
+f1 <- f1$eval(fit$coefficients, deriv = 2)
+log.htx(f1, deriv=0)$h
+gridExtra::grid.arrange(
+ggplot(data.frame(x = f1$ax,
+log_htx = log.htx(f1, deriv=0)$h), aes(x = x, y=log_htx))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = f1$ax,
+stx = exp(log.Stx(f1, deriv=0)$s)), aes(x = x, y=stx))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = f1$ax,
+f = f1$f), aes(x = x, y=f))+
+geom_line()+geom_point(), ncol=2)
+gridExtra::grid.arrange(
+ggplot(data.frame(x = f1$ax,
+log_htx = log.htx(f1, deriv=0)$h), aes(x = x, y=log_htx))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = f1$ax,
+stx = exp(log.Stx(f1, deriv=0)$s)), aes(x = x, y=stx))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = f1$ax,
+f = f1$f), aes(x = x, y=f))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = dat$times,
+f = S0(dat$times)), aes(x = x, y=f))+
+geom_line()+geom_point(), ncol=2)
+gridExtra::grid.arrange(
+ggplot(data.frame(x = f1$ax,
+log_htx = log.htx(f1, deriv=0)$h), aes(x = x, y=log_htx))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = f1$ax,
+stx = exp(log.Stx(f1, deriv=0)$s)), aes(x = x, y=stx))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = f1$ax,
+f = f1$f), aes(x = x, y=f))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = dat$times,
+f = S0(dat$times, p=pp)), aes(x = x, y=f))+
+geom_line()+geom_point(), ncol=2)
+gridExtra::grid.arrange(
+ggplot(data.frame(x = f1$ax,
+log_htx = log.htx(f1, deriv=0)$h), aes(x = x, y=log_htx))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = f1$ax,
+stx = exp(log.Stx(f1, deriv=0)$s)), aes(x = x, y=stx))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = f1$ax,
+f = f1$f), aes(x = x, y=f))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = dat$times,
+f = S0(dat$times, p=pp)), aes(x = x, y=f))+
+geom_point(), ncol=2)
+gridExtra::grid.arrange(
+ggplot(data.frame(x = f1$ax,
+log_htx = log.htx(f1, deriv=0)$h), aes(x = x, y=log_htx))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = f1$ax,
+stx = exp(log.Stx(f1, deriv=0)$s)), aes(x = x, y=stx))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = f1$ax,
+f = f1$f), aes(x = x, y=f))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = dat$times,
+f = S0(dat$times, p=pp)), aes(x = x, y=f))+
+geom_point()+ylab("true s0"), ncol=2)
+S0 <- function(t, p=0.8, lambda1 = 0.1, gamma1 = 3, lambda2=0.1, gamma2=1.6){
+p*exp(-lambda1*t^gamma1) + (1-p)*exp(-lambda2 * t^gamma2)
+}
+gridExtra::grid.arrange(
+ggplot(data.frame(x = f1$ax,
+log_htx = log.htx(f1, deriv=0)$h), aes(x = x, y=log_htx))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = f1$ax,
+stx = exp(log.Stx(f1, deriv=0)$s)), aes(x = x, y=stx))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = f1$ax,
+f = f1$f), aes(x = x, y=f))+
+geom_line()+geom_point(),
+ggplot(data.frame(x = dat$times,
+f = S0(dat$times)), aes(x = x, y=f))+
+geom_point()+ylab("true s0"), ncol=2)
+gridExtra::grid.arrange(
+ggplot(data.frame(x = f1$ax,
+htx = exp(log.htx(f1, deriv=0)$h)), aes(x = x, y=log_htx))+
+geom_line()+geom_point()+ylab("hazard function"),
+ggplot(data.frame(x = f1$ax,
+stx = exp(log.Stx(f1, deriv=0)$s)), aes(x = x, y=stx))+
+geom_line()+geom_point()+ylab("estimated s0"),
+ggplot(data.frame(x = f1$ax,
+f = f1$f), aes(x = x, y=f))+
+geom_line()+geom_point()+ylab("smooth function"),
+ggplot(data.frame(x = dat$times,
+f = S0(dat$times)), aes(x = x, y=f))+
+geom_point()+ylab("true s0"), ncol=2)
+htx = exp(log.htx(f1, deriv=0)$h), aes(x = x, y=log_htx))+
+exp(log.htx(f1, deriv=0)$h))
+exp(log.htx(f1, deriv=0)$h))
+exp(log.htx(f1, deriv=0)$h)
+exp(log.htx(f1, deriv=0)$h)
+gridExtra::grid.arrange(
+ggplot(data.frame(x = f1$ax,
+htx = exp(log.htx(f1, deriv=0)$h)), aes(x = x, y=htx))+
+geom_line()+geom_point()+ylab("hazard function"),
+ggplot(data.frame(x = f1$ax,
+stx = exp(log.Stx(f1, deriv=0)$s)), aes(x = x, y=stx))+
+geom_line()+geom_point()+ylab("estimated s0"),
+ggplot(data.frame(x = f1$ax,
+f = f1$f), aes(x = x, y=f))+
+geom_line()+geom_point()+ylab("smooth function"),
+ggplot(data.frame(x = dat$times,
+f = S0(dat$times)), aes(x = x, y=f))+
+geom_point()+ylab("true s0"), ncol=2)
+## optimization
+fit <- aft_nl(~s_ncon(st, m=c(4,2), k = 7, trans = trans_linear()), data = dat,
+censored = dat$c, trace = TRUE)
+fit$iterations
+fit$coef
+alph <- fit$coefficients[1:3]
+alph/alph[1]
+f1 <- f1$eval(fit$coefficients, deriv = 2)
+source("~/Dropbox/dottorato pd/Accelerated_failure_time/code/simulations.R", echo=TRUE)
+source("~/Dropbox/dottorato pd/Accelerated_failure_time/code/simulations.R", echo=TRUE)
+build()

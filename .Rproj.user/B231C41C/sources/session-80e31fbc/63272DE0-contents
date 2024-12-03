@@ -1,0 +1,100 @@
+#'
+#' Log-Hazard function
+#'
+#' @rdname log.htx
+#' @export log.htx
+#'
+log.htx <- function(o, deriv = 1, delta = NULL, param = NULL){
+
+  if( is.null(param) ){
+    param <- o$param
+    if( is.null(param) ){ stop("param vector not provided!") }
+  } else {o <- o$eval(param = param, deriv = deriv+1) }
+
+  if(o$deriv<deriv+1){o <- o$eval(param = param, deriv = deriv+1)}
+
+  if(is.null(delta)){
+    delta <- rep(TRUE, length(o$f))
+  } else{delta <- as.logical(delta)}
+
+  d0 <- o$f[delta]; d1 <- o$store$f1[delta]; d2 <- o$store$f2[delta];
+  d3 <- o$store$f3[delta]
+  u1 <- o$store$u1[delta,]; u2 <- o$store$u2[delta,]
+  g1 <- o$store$g1
+  Xi <- o$store$Xi[delta,]; X <- o$store$X0[delta,]
+  X1 <- o$store$X1[delta,]; X2 <- o$store$X2[delta,]
+
+  alpha <- param[1:o$na]
+  alpha <- c(exp(alpha[1]), -alpha[-1]) # reparametrise alpha
+
+  beta <- param[-(1:o$na)]
+  if(o$drop.coef) {betat <- exp(beta)
+  } else {betat <- c(beta[1], exp(beta[-1]))}
+
+  n <- nrow(Xi)
+
+  if(any(is.na(log(d1)) | is.infinite(log(d1)))){print(min(d1));print(paste0(param, collapse = ","));print(sd(o$ax))}
+
+  log.t <- o$store$Xi[delta,1]
+
+  out <- list()
+
+  f <- d0 + log(d1)
+  out$h <- f - log.t + log(alpha[1])
+
+  if(deriv >=1){
+    aQ <- sweep(u1, 2, g1, "*")
+    if(o$drop.coef) {btb <- betat
+    } else {btb <- c(1,betat[-1])}
+
+    f1 <- d1 + d2/d1      # f'
+    dfdbt <- colSums2(X + X1/d1)    # df / d betatilde
+
+    out$dhda <- crossprod(f1, aQ)
+    out$dhda[1] <- out$dhda[1] + n
+    out$dhdb <- dfdbt * btb
+
+    if(deriv >=2){
+      f2 <- d2 + d3/d1 - (d2/d1)^2  # f''
+      df1dbt <- X1 + X2/d1 - X1 * d2/d1^2
+
+      if(o$unif){
+        daa <- diag(rep(0, o$na))
+        daa[lower.tri(daa, diag = TRUE)] <- crossprod(f1, u2)
+        daa[upper.tri(daa, diag=FALSE)] <- t(daa)[upper.tri(daa, diag = FALSE)]
+        daa <- daa*g1%o%g1
+        h_aa <- crossprod(aQ, f2 * aQ) - daa   # t(aQ)%*%diag(f'')%*%aQ
+      } else {
+        daa <- diag(rep(0, o$na))
+        daa[,1] <- daa[1,] <- crossprod(f1, u1)
+        h_aa <- crossprod(aQ, f2 * aQ)
+      }
+
+      h_aa[1,1] <- h_aa[1,1] + out$dhda[1] - n #crossprod(f1, aQ[,1])
+      # h_bb <- - (t(X1)%*%(X1/d1^2)) * btb%o%btb
+      h_bb <- - diag(btb) %*% (crossprod(X1,X1/d1^2)) %*% diag(btb)
+
+      if(o$drop.coef) {
+        diag(h_bb) <- diag(h_bb) + (out$dhdb)
+      } else {diag(h_bb)[-1] <- diag(h_bb)[-1] + (out$dhdb)[-1]}
+
+      h_ba <- crossprod(df1dbt, aQ)*(btb%o%rep(1, o$na))
+
+      out$dhab <- rbind(cbind(h_aa, t(h_ba)),
+                    cbind(h_ba, h_bb))
+      # if(deriv>=3){
+      #   f3 <- d3 + d4/d1 - d2/d1^2*(3*d3 - 2*d2^2/d1)
+      #   g3 <- 2*n/alpha[1]^3
+      #   df2dbt <- X1%*%(-d3/d1^2 + 2*(d2/d1)^2) + X2%*%(1-2*d2/d1^2) + X3/d1
+      #
+      #   h_aaa <- lapply(1:ncol(X),
+      #                   function(ii) t(Xi) %*% (f3 * Xi[,ii] * Xi))   # t(Xi)%*%diag(f'')%*%Xi
+      #   h_aaa[[1]][1,1] <- h_aaa[[1]][1,1] + g3
+      #
+      #   h_aab <- (t(Xi)%*% Xi) %o% df2dbt * btb # each slice derivs wrt different beta_i
+      #   # h_abb <-
+      # }
+    }
+  }
+  return( out )
+}

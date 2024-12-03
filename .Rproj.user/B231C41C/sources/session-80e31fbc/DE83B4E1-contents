@@ -1,0 +1,87 @@
+rm(list = ls())
+library(devtools)
+load_all()
+# load_all("./aftNested")
+
+wrap_rweibull <- function(n, lambda, gamma){
+  # generate from a weibull using the parametrization in the draft
+  sc <- lambda^(-1/gamma); sh <- gamma
+  rweibull(n, scale = sc, shape = sh)
+}
+
+n <- 1000
+p <- 2
+aa <- c(-3,0)
+
+X <- matrix(rbeta(n*(p), 0.5,2), ncol = p)
+x1 <- rbeta(n, 0.5,2)
+pp <- rbinom(n,1,0.5)
+times <- X[,1:p]%*%aa + 0*sin(5*x1) + pp*wrap_rweibull(n, 1,1) + (1-pp)*wrap_rweibull(n, 6,1)
+
+par(mfrow = c(2,2))
+plot(density(times-(X[,1:p]%*%aa + 0*sin(x1))))
+plot(times~X[,1])
+plot(times~X[,p])
+plot(times~x1)
+
+dat <- data.frame(times = times,
+                  x1 = x1,
+                  x2 = X)
+
+# add censoring ####
+C <- quantile(dat$times, .97)
+dat$c <- as.numeric(dat$times<C)
+dat$times[dat$c==0] <- C
+hist(dat$times, breaks = 50)
+hist(exp(dat$times), breaks = 50)
+
+sample_val <- sample.int(n, n/4)
+validation <- dat[sample_val,]
+dat <- dat[-sample_val,]
+
+# fit <- aft_nl(~s_ncon(st, m=c(4,2), k = 15, trans = trans_linear()),
+#               data = dat, val = validation,
+#               censored = "c", trace = TRUE)
+debugonce(aft_nl)
+set.seed(123)
+fit2 <- aft_nl(times ~ s(x1, k=10) + x2.1 + x2.2,
+               data = dat, val = validation, #unif=FALSE,
+               censored = "c", trace = TRUE, ps = TRUE)
+#
+# f1 <- get.si(fit)
+f2 <- get.si(fit2$smooth, fit2$coefficients)
+
+
+
+# f1$alpha
+f2$alpha[1:(p+1)]
+plot((fit2$smooth$xt$si$X[,1])-(-fit2$smooth$xt$si$X[,-1]%*%(f2$alpha[-1])));
+abline(0,1, col="red")
+plot(fit2$smooth$xt$si$X[,-(1:(p+1))]%*%(f2$alpha[-(1:(p+1))])~dat$x1, ylim= c(-1,1))
+points(-sin(5*dat$x1)+mean(sin(5*dat$x1))~dat$x1, col="grey")
+# tf1 <- fit$smooth$xt$si$X[,-1]%*%f1$alpha[-1]
+tf2 <- fit2$smooth$xt$si$X[,-1]%*%f2$alpha[-1]
+
+# plot(tf1~tf2)
+plot(density(dat$times-dat$st[,-1]%*%aa), ylim = c(0,1))
+
+par(mfrow=c(2,2))
+ww <- dat$times-dat$st[,-1]%*%aa
+ssurv <- 1-rank(ww)/n
+plot(ssurv~(ww), col = (ssurv-exp(f2$s$s)<0)+1)
+# plot(exp(f1$s)~(f1$xba), ylim = c(0,1))
+plot(exp(f2$s$s)~(f2$xba), ylim = c(0,1), col = (ssurv-exp(f2$s$s)<0)+1)
+plot(dat$st[,-1]%*%aa~(dat$st[,-1]%*%f2$alpha[-1]), col = (ssurv-exp(f2$s$s)<0)+1)
+plot(ssurv~exp(f2$s$s))
+plot(ssurv-exp(f2$s$s))
+
+hist(times-X%*%aa, breaks = 50)
+plot(exp(f2$h$h)*exp(f2$s$s)~f2$xba)
+#
+#
+#
+#
+#
+#
+#
+#
