@@ -9,8 +9,8 @@ lambda.optim <- function(eff, sm,delta, vpen,mpen, env,val,delta.val,
   eff.val <- eff_misi(.predict.matrix.si(sm, val, get.xa = TRUE)$Xi,
                       basis = sm$xt$basis)
 
-  .optim_lambda <- function(lambda){
-
+  .optim_lambda <- function(rho){
+    lambda <- exp(rho)
     llk <- llk_afc(eff, sm = sm, delta = delta, vpen = vpen, mpen = mpen,
                    lambda = lambda, ...)
     llk.val <- llk_afc(eff.val, sm = sm, delta = delta.val, mpen=mpen,
@@ -30,21 +30,21 @@ lambda.optim <- function(eff, sm,delta, vpen,mpen, env,val,delta.val,
     loss <- gcv.aft_nl(out, llk.val, kde = eff$eval(sm$coefficients)$kde)
     attr(loss, "gradient") <- attr(loss, "hessian") <-NULL
 
-    Spen <- Reduce("+", lapply(1:length(sm$S), function(ii) lambda[ii]*sm$S[[ii]]))
-    evS <- eigen(Spen, only.values = TRUE)$values
-    H <- attr(llk(param = sm$coefficients), "hessian")
-    evH <- eigen(H, only.values = TRUE)$values
-
-    laml <- c(out$minimum + 0.5 *( sum(log(evS[evS>1e-16])) -
-      0.5 * sum(log(evH[evS>1e-16])) + sm$null.space.dim * log(2*pi) ))
+    # Spen <- Reduce("+", lapply(1:length(sm$S), function(ii) lambda[ii]*sm$S[[ii]]))
+    # evS <- eigen(Spen, only.values = TRUE)$values
+    # H <- attr(llk(param = sm$coefficients), "hessian")
+    # evH <- eigen(H, only.values = TRUE)$values
+    #
+    # laml <- c(out$minimum + 0.5 *( sum(log(evS[evS>1e-16])) -
+    #   0.5 * sum(log(evH[evS>1e-16])) + sm$null.space.dim * log(2*pi) ))
     # print(laml)
     if(trace){
       cat(paste0("iter = ", out$iterations,
-                 "\nGCV: ", laml, "  ||   llk = ", env$out$minimum,
+                 "\nGCV: ", loss, "  ||   llk = ", env$out$minimum,
                  "\nlambda = ", paste(lambda, collapse = "\t "), "\n\n"))
     }
 
-    return(laml)
+    return(loss)
   }
   return(.optim_lambda)
 }

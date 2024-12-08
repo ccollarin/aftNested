@@ -26,7 +26,7 @@ get.si <- function(sm, coefs , X=NULL, deriv = 0){
   alpha <- drop(B %*% (alpha + a0))
   alpha <- c(exp(alpha[1]), -alpha[-1])/exp(alpha[1])
 
-  out <- list(xba = drop(X %*% alpha) + drop(si$xm %*% alpha),
+  out <- list(xba = drop(X %*% alpha) + drop((si$xm) %*% alpha),
               f = eff$f,
               s = log.Stx(eff, deriv = deriv),
               h = log.htx(eff, deriv = deriv),

@@ -1,4 +1,3 @@
-#'
 #' Monotone increasing single index effects for mgcv
 #'
 #' @name smooth.construct.misi.smooth.spec
@@ -9,18 +8,27 @@
 #'
 smooth.construct.misi.smooth.spec <- function(object, data, knots, unif=FALSE){
 
+
   # Most information on single index matrix and penalty is inside "si" list.
   si <- object$xt$si
   if( is.null(si) ){ si <- object$xt$si <- list() }
 
+
   # Inner model matrix (to be projected via single index)
   Xi <- data[[object$term]]
+
 
   # Need to center Xi and save colMeans because we need to subtract it when predicting using new data
   Xi <- scale(Xi, scale = FALSE)
   si$xm <- attr(Xi, "scaled:center")
 
+  if("(Intercept)"%in%colnames(Xi)){
+    Xi[,"(Intercept)"] <- 1
+    si$xm["(Intercept)"] <- 0
+  }
+
   di <- ncol( Xi )
+
 
   # Dealing with inner penalty
   Si <- si$S
@@ -41,6 +49,7 @@ smooth.construct.misi.smooth.spec <- function(object, data, knots, unif=FALSE){
     # Reparametrise Xi so that the penalty on the single index vector is diagonal
     si <- append(si, aftNested:::.diagPen(X = Xi, S = Si, r = rankSi, fl = si$fplp))
   }
+
 
   # alpha is vector of inner coefficients, si$alpha is a vector of initial values for it.
   # alpha0 is an offset such that the full_alpha = alpha + alpha0
@@ -65,6 +74,7 @@ smooth.construct.misi.smooth.spec <- function(object, data, knots, unif=FALSE){
   si$alpha <- si$alpha / tmp
   si$a0  <- si$a0 / tmp
 
+
   # Compute single index vector and store it in the data
   ax <- drop( si$X %*% (si$alpha + si$a0) )
   if(unif){
@@ -76,8 +86,10 @@ smooth.construct.misi.smooth.spec <- function(object, data, knots, unif=FALSE){
   }
   si$alpha[1] <- log(si$alpha[1]); si$alpha[-1] <- - si$alpha[-1]
 
+
   # Construct the B-splines corresponding to the outer smooth effect
   out <- .build_nmi_bspline_basis(object = object, data = data, knots = knots, si = si)
+
 
   # Add inner penalty matrix (diagonalised and padded with zeros corresponding to the outer coefficients)
   dsmo <- out$bs.dim - di
@@ -86,15 +98,17 @@ smooth.construct.misi.smooth.spec <- function(object, data, knots, unif=FALSE){
     out$S <- c(out$S,
                lapply(si$S, function(ss) {
                  rbind(cbind(ss, matrix(0, di, dsmo)),
-                        cbind(matrix(0, dsmo, di), matrix(0, dsmo, dsmo)))}))
+                       cbind(matrix(0, dsmo, di), matrix(0, dsmo, dsmo)))}))
     out$null.space.dim <- out$null.space.dim +  - Reduce("+", si$rank)
     out$rank <- c(out$rank, Reduce("+", si$rank))
   }
+
 
   out$kde <- object$kde
   out$xt$basis$unif <- unif
   out$first.para <- length(si$alpha)+1
   out$last.para <- out$first.para + dsmo - 1
+
 
   class(out) <- c("si", "nested")
   return( out )

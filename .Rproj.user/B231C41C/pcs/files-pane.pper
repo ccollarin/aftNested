@@ -6,7 +6,7 @@
         },
         {
             "columnIndex": 2,
-            "ascending": false
+            "ascending": true
         }
     ],
     "path": "~/Dropbox/dottorato pd/Accelerated_failure_time/code/aftNested/R"

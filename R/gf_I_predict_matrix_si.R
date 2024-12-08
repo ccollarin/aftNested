@@ -24,7 +24,7 @@
   # Compute outer model matrix
   X0 <- object$xt$basis$evalX(x = xa, deriv = 0)$X0
 
-  # Total model matrix is X0 preceded my matrix of zeros.
+  # Total model matrix is X0 preceded by matrix of zeros.
   # predict.gam will multiply the latter by alpha, which will have no effect (this is a trick).
   Xtot <- cbind(matrix(0, nrow(X0), length(alpha)), X0)
 

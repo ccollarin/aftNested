@@ -39,26 +39,21 @@ llk_afc <- function(obj, sm, delta, lambda, vpen, mpen) {
 
   force(obj); force(sm); force(delta); force(vpen);force(trace); force(lambda)
   .out_fun <- function(param, deriv = 2, kde=NULL){
-
     if (is.list(param) ) param <- do.call("cbind", param)
     if (is.vector(param)) param <- matrix(param, ncol = 1)
 
-    obj <- tryCatch(obj$eval(param = param, deriv = deriv+1, kde),
-                    warning = function(war) {print(war)})
+    obj <- obj$eval(param = param, deriv = deriv+1, kde)
 
-
-    ltx <- tryCatch(log.htx(obj, deriv = deriv, delta = delta),
-                    warning = function(war) {print(war)})
-    stx <- tryCatch(log.Stx(obj, deriv = deriv),
-                    warning = function(war) {print(war)})
+    ltx <- log.htx(obj, deriv = deriv, delta = delta)
+    stx <- log.Stx(obj, deriv = deriv)
 
     llk <- sum(ltx$h) + sum(stx$s)
     loss_d1 <- loss_d2 <- NULL
     na <- obj$na
     Spen <- Reduce("+", lapply(1:length(sm$S), function(ii) lambda[ii]*sm$S[[ii]])) # Outer and inner ridge penalties
     pen <- pen_var_si(o = obj, v = 1, deriv = deriv)
-    pen_m <- pen_mean_logS(sm = sm, coefs = param, deriv = deriv)
-    loss <- drop(- llk + vpen*pen$d0 + t(param)%*%Spen%*%param) #+ mpen*pen_m$d0
+    # pen_m <- pen_mean_logS(sm = sm, coefs = param, deriv = deriv)
+    loss <- drop(- llk + vpen*pen$d0 + t(param)%*%Spen%*%param)
     # print(pen_m$d0)
     # print(paste0("llk ", llk,
     #              "   ps  ", t(param)%*%Spen%*%param,
@@ -66,12 +61,12 @@ llk_afc <- function(obj, sm, delta, lambda, vpen, mpen) {
     if(deriv > 0){
       d1 <- c(ltx$dhda + stx$dhda,
               ltx$dhdb + stx$dhdb)
-      loss_d1 <- - d1 + 2 * Spen %*% param #+ mpen*pen_m$d1
+      loss_d1 <- - d1 + 2 * Spen %*% param
       loss_d1[1:na] <- loss_d1[1:na] + vpen*pen$d1
 
       if(deriv > 1){
         d2 <- ltx$dhab + stx$dhab
-        loss_d2 <- - d2 + 2 * Spen #+ mpen*pen_m$d2
+        loss_d2 <- - d2 + 2 * Spen
         loss_d2[1:na, 1:na] <- loss_d2[1:na, 1:na] + vpen*pen$d2
       }
     }

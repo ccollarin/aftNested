@@ -6,10 +6,10 @@
         "caseSensitive": false,
         "wholeWord": true,
         "filePatterns": [],
-        "useGitGrep": false,
+        "useGitGrep": true,
         "excludeGitIgnore": true,
         "excludeFilePatterns": [],
-        "resultsCount": 11,
+        "resultsCount": 9,
         "errorCount": 0,
         "replaceErrors": "",
         "projectRelative": true
