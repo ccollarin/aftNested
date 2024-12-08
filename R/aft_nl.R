@@ -8,8 +8,7 @@
 #' @export
 #'
 aft_nl <- function(formula, data = list(),val = list(),outer.args = list(),
-                   censored=NULL, min.lambda = 0.005, trace=FALSE,
-                   ps = TRUE, ...){
+                   censored=NULL, trace=FALSE, ps = TRUE, ...){
 
   dat <- .prep.df(formula, data, val,censored, m=outer.args$m, k=outer.args$k, pspline = ps)
 
